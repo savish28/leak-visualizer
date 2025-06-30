@@ -1,0 +1,23 @@
+# Use a lean Python base image for the FastAPI application.
+FROM python:3.10-slim-buster
+
+# Set the working directory inside the container for the backend.
+WORKDIR /app/backend
+
+# Copy the backend Python dependency file.
+COPY requirements.txt .
+
+# Install Python dependencies. Use --no-cache-dir for smaller image size.
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the backend application files and the ONNX model.
+COPY . .
+
+# Expose the port that FastAPI will listen on.
+EXPOSE 8001
+
+# Command to run the FastAPI application using Uvicorn.
+# The host is set to 0.0.0.0 to make it accessible from outside the container.
+# The port is 8001 as configured in main.py.
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+

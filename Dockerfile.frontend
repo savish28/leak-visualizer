@@ -1,0 +1,25 @@
+# Stage 1: Build and Run the React frontend application
+# We use a Node.js base image.
+FROM node:20-alpine
+
+# Set the working directory inside the container for the frontend.
+WORKDIR /app
+
+# Copy package.json and package-lock.json (or yarn.lock) to leverage Docker cache.
+# This ensures npm install runs only if dependencies change.
+COPY package*.json ./
+
+# Install frontend dependencies.
+RUN npm install
+
+# Copy the entire React project source code.
+COPY . .
+
+# Expose the default port for Create React App's development server.
+EXPOSE 3000
+
+# Command to start the React development server.
+# This serves the application and handles hot-reloading.
+# You might need to add --host 0.0.0.0 if running in some environments
+# to ensure it binds to all network interfaces.
+CMD ["npm", "start"]
