@@ -7,6 +7,11 @@ This project implements a real-time leak detection system for a pipe network, co
 A short demo video showcasing the dashboard in use will be attached here.
 
 
+https://github.com/user-attachments/assets/1270cc2f-bb9a-4feb-b010-1170ca084e2a
+
+
+
+
 ## **Functionality**
 
 The application provides the following key capabilities:
