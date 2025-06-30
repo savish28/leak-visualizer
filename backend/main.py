@@ -1,4 +1,3 @@
-import os
 import sys
 from datetime import datetime  # Import datetime for timestamp
 import asyncio  # Import asyncio for thread-safe list operations
@@ -10,7 +9,7 @@ from fastapi import (
     Form,
     HTTPException,
 )  # Import Form for sensor_id
-import uvicorn  # Required to run the FastAPI app
+from fastapi.middleware.cors import CORSMiddleware
 
 # Import functions and constants from the model_inference module
 from model_inference import load_onnx_session, model_inference
@@ -28,6 +27,21 @@ app = FastAPI(
     description="API for inferring leak/normal classification from RGB PNG images using an ONNX model.",
     version="1.0.0",
 )
+
+# --- CORS Configuration ---
+# Add CORS middleware to allow requests from your React frontend
+# Allowing all origins is generally not recommended for production environments
+# due to security risks. Restrict to specific origins when deploying.
+origins = ["*"]  # Allowed all hosts as requested
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allows specified origins
+    allow_credentials=True,  # Allows cookies to be included in cross-origin requests
+    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
+# --- END CORS Configuration ---
 
 
 @app.on_event("startup")
