@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+numpy
+Pillow
+onnxruntime
+python-multipart
