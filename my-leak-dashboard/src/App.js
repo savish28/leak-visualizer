@@ -119,39 +119,41 @@ function App() {
       }
       const data = await response.json();
 
+      // Process data to find the latest prediction for each sensor
+      const latestPredictions = {};
+      data.forEach(item => {
+        // Convert timestamp to Date objects for comparison
+        const itemTimestamp = new Date(item.timestamp);
+        if (!latestPredictions[item.sensor_id] || itemTimestamp > new Date(latestPredictions[item.sensor_id].timestamp)) {
+          latestPredictions[item.sensor_id] = item;
+        }
+      });
+
       setSensorStates(prevStates => {
         const newStates = { ...prevStates };
         let manualFloorAdded = false;
-        data.forEach(item => {
-          if (newStates[item.sensor_id]) {
-            newStates[item.sensor_id] = {
-              ...newStates[item.sensor_id],
-              prediction: item.prediction,
-              confidence: item.confidence,
-              timestamp: item.timestamp,
-              severity: item.severity,
-              spectrogram_path: item.spectrogram_path,
-            };
-          } else {
-            newStates[item.sensor_id] = {
-              id: item.sensor_id,
-              sensor_id: item.sensor_id,
-              name: item.sensor_id,
-              location_description: item.location_description || "Manual Upload",
-              floor_reference: item.floor_reference || "Manual",
-              x_coordinate: item.x_coordinate || -1,
-              y_coordinate: item.y_coordinate || -1,
-              prediction: item.prediction,
-              confidence: item.confidence,
-              timestamp: item.timestamp,
-              severity: item.severity,
-              spectrogram_path: item.spectrogram_path,
-            };
-            if (item.floor_reference === "Manual") {
-              manualFloorAdded = true;
-            }
+
+        Object.values(latestPredictions).forEach(item => {
+          newStates[item.sensor_id] = {
+            ...newStates[item.sensor_id], // Keep existing sensor config data
+            id: item.sensor_id, // Ensure ID is set correctly
+            sensor_id: item.sensor_id, // Ensure sensor_id is set correctly
+            prediction: item.prediction,
+            confidence: item.confidence,
+            timestamp: item.timestamp,
+            severity: item.severity,
+            spectrogram_path: item.spectrogram_path,
+            location_description: item.location_description || (newStates[item.sensor_id] ? newStates[item.sensor_id].location_description : "Manual Upload"),
+            floor_reference: item.floor_reference || (newStates[item.sensor_id] ? newStates[item.sensor_id].floor_reference : "Manual"),
+            x_coordinate: item.x_coordinate || (newStates[item.sensor_id] ? newStates[item.sensor_id].x_coordinate : -1),
+            y_coordinate: item.y_coordinate || (newStates[item.sensor_id] ? newStates[item.sensor_id].y_coordinate : -1),
+            name: item.sensor_id.replace('sensor-', '').replace('-', ' ').toUpperCase(), // Re-derive name
+          };
+          if (item.floor_reference === "Manual") {
+            manualFloorAdded = true;
           }
         });
+
         if (manualFloorAdded) {
           setAvailableFloors(prevFloors => {
             if (!prevFloors.includes("Manual")) {
@@ -162,7 +164,7 @@ function App() {
         }
         return newStates;
       });
-      setPredictionHistory(data);
+      setPredictionHistory(data); // Keep full history for the table
     } catch (e) {
       console.error("Failed to fetch prediction history:", e);
       setError(e.message || "Failed to load history.");
@@ -189,6 +191,8 @@ function App() {
         data.forEach(sensor => {
           initialStates[sensor.id] = {
             ...sensor,
+            // Ensure sensor_id is always present, using sensor.id as fallback
+            sensor_id: sensor.sensor_id || sensor.id,
             prediction: 'Unknown',
             confidence: 0,
             timestamp: null,
