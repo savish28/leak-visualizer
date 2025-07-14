@@ -2,7 +2,12 @@
 
 This project implements a real-time leak detection system for a pipe network, combining a Python FastAPI backend for AI inference with a React frontend for visualization and control. The system processes simulated spectrograms from multiple sensors to identify "leak" or "normal" conditions and provides a comprehensive dashboard for monitoring and analysis.
 
-## **Demo Video**
+## **Floor Plan Sensor Leak Detector Video**
+https://github.com/user-attachments/assets/4988dbc1-5b11-4424-b0b2-613b221acba4
+
+
+
+## **MVP Video (Basic Simulation)**
 
 A short demo video showcasing the dashboard in use will be attached here.
 
